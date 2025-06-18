@@ -1,4 +1,5 @@
 const passphraseToggle = document.getElementById('passphraseToggle');
+const saveSettingsCheckbox = document.getElementById('saveSettings');
 const capitalizeWords = document.getElementById('capitalizeWords');
 const wordCountSlider = document.getElementById('wordCountSlider');
 const wordCountValue = document.getElementById('wordCountValue');
@@ -18,10 +19,15 @@ const refreshpw = document.getElementById('refreshpw');
 const languageSelect = document.getElementById('languageSelect');
 const BASE_PATH = window.BASE_PATH || '';
 
-separator.onchange = () =>
+separator.onchange = () => {
   customSeparator.style.display = separator.value === 'custom' ? 'block' : 'none';
+  saveSettings();
+};
 
-passphraseToggle.onchange = togglePassphraseOptions;
+passphraseToggle.onchange = () => {
+  togglePassphraseOptions();
+  saveSettings();
+};
 
 function togglePassphraseOptions() {
   document.getElementById('passwordOptions').style.display = passphraseToggle.checked ? 'none' : 'block';
@@ -32,7 +38,10 @@ function togglePassphraseOptions() {
 
 document.querySelectorAll('input, select').forEach(element => {
   if (element.id !== 'passphraseToggle') {
-    element.addEventListener('change', generatePassword);
+    element.addEventListener('change', () => {
+      generatePassword();
+      saveSettings();
+    });
   }
 });
 
@@ -172,3 +181,69 @@ function copyPassword(index) {
     document.body.removeChild(textArea);
   }
 }
+
+function saveSettings() {
+  if (saveSettingsCheckbox.checked) {
+    const settings = {
+      includeUppercase: includeUppercase.checked,
+      includeDigits: includeDigits.checked,
+      includeSpecial: includeSpecial.checked,
+      excludeHomoglyphs: excludeHomoglyphs.checked,
+      length: lengthSlider.value,
+      passphraseToggle: passphraseToggle.checked,
+      capitalizeWords: capitalizeWords.checked,
+      includeNumbers: includeNumbers.checked,
+      includeSpecialChars: includeSpecialChars.checked,
+      wordCount: wordCountSlider.value,
+      separator: separator.value,
+      customSeparator: customSeparator.value,
+      maxWordLength: maxWordLength.value,
+      language: languageSelect.value,
+      customLanguage: document.getElementById('customLanguage').value,
+    };
+    document.cookie = `pwgen-settings=${JSON.stringify(settings)};path=/;max-age=31536000;samesite=strict`;
+  } else {
+    document.cookie = 'pwgen-settings=;path=/;max-age=-1';
+  }
+}
+
+function loadSettings() {
+  const cookies = document.cookie.split('; ');
+  const settingsCookie = cookies.find(row => row.startsWith('pwgen-settings='));
+  if (settingsCookie) {
+    try {
+      const settings = JSON.parse(settingsCookie.split('=')[1]);
+
+      includeUppercase.checked = settings.includeUppercase;
+      includeDigits.checked = settings.includeDigits;
+      includeSpecial.checked = settings.includeSpecial;
+      excludeHomoglyphs.checked = settings.excludeHomoglyphs;
+      lengthSlider.value = settings.length;
+      lengthValue.innerText = settings.length;
+      passphraseToggle.checked = settings.passphraseToggle;
+      capitalizeWords.checked = settings.capitalizeWords;
+      includeNumbers.checked = settings.includeNumbers;
+      includeSpecialChars.checked = settings.includeSpecialChars;
+      wordCountSlider.value = settings.wordCount;
+      wordCountValue.innerText = settings.wordCount;
+      separator.value = settings.separator;
+      if (separator.value === 'custom') {
+        customSeparator.style.display = 'block';
+        customSeparator.value = settings.customSeparator;
+      }
+      maxWordLength.value = settings.maxWordLength;
+      languageSelect.value = settings.language;
+      if (languageSelect.value === 'custom') {
+        document.getElementById('customLanguage').style.display = 'block';
+        document.getElementById('customLanguage').value = settings.customLanguage;
+      }
+      saveSettingsCheckbox.checked = true;
+      togglePassphraseOptions();
+    } catch (e) {
+      console.error('Error parsing settings cookie:', e);
+      document.cookie = 'pwgen-settings=;path=/;max-age=-1';
+    }
+  }
+}
+
+window.addEventListener('load', loadSettings);
