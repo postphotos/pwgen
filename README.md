@@ -66,6 +66,7 @@ docker run -d -p 5069:5069 \\
   -e PP_LANGUAGE_CUSTOM='' \\
   -e MULTI_GEN=true \\
   -e GENERATE_PP=true \\
+  -e SHOW_SAVE_SETTINGS=true \\
   -e ROBOTS_ALLOW=false \\
   -e GOOGLE_SITE_VERIFICATION='' \\
   -e DISABLE_URL_CHECK=false \\
