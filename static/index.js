@@ -214,7 +214,7 @@ function loadSettings() {
   const settingsCookie = cookies.find(row => row.startsWith('pwgen-settings='));
   if (settingsCookie) {
     try {
-      const settings = JSON.parse(settingsCookie.split('=')[1]);
+      const settings = JSON.parse(settingsCookie.substring(settingsCookie.indexOf('=') + 1));
 
       includeUppercase.checked = settings.includeUppercase;
       includeDigits.checked = settings.includeDigits;
