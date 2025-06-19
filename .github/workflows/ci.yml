@@ -1,10 +1,12 @@
-name: ci-dev
+name: docker-publish
 on:
   push:
-    branches-ignore:
+    branches:
       - main
+    tags:
+      - v*
 concurrency:
-  group: ci-dev-${{ github.ref }}
+  group: docker-publish-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -29,10 +31,10 @@ jobs:
       - id: meta
         uses: docker/metadata-action@v5
         with:
-          images: jocxfin/pwgen-dev
+          images: jocxfin/pwgen
+          flavor: latest=true
           tags: |
             type=raw,value=${{ matrix.arch }}
-            type=raw,value=latest-${{ matrix.arch }}
       - uses: docker/build-push-action@v6
         with:
           context: .
@@ -43,8 +45,8 @@ jobs:
           sbom: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=pwgen-dev-${{ matrix.arch }}
-          cache-to: type=gha,scope=pwgen-dev-${{ matrix.arch }},mode=max
+          cache-from: type=gha,scope=pwgen-${{ matrix.arch }}
+          cache-to: type=gha,scope=pwgen-${{ matrix.arch }},mode=max
   manifest:
     needs: build
     runs-on: self-hosted
@@ -57,11 +59,13 @@ jobs:
       - id: meta
         uses: docker/metadata-action@v5
         with:
-          images: jocxfin/pwgen-dev
+          images: jocxfin/pwgen
+          flavor: latest=true
           tags: |
-            type=raw,value=latest
+            type=semver,pattern={{version}},enable={{is_tag}}
+            type=semver,pattern={{major}}.{{minor}},enable={{is_tag}}
       - run: |
           docker buildx imagetools create \
-            --tag jocxfin/pwgen-dev:latest \
-            jocxfin/pwgen-dev:amd64 \
-            jocxfin/pwgen-dev:arm64
+            $(echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | xargs -I {} echo --tag {}) \
+            jocxfin/pwgen:amd64 \
+            jocxfin/pwgen:arm64
