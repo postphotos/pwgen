@@ -32,7 +32,6 @@ jobs:
           images: jocxfin/pwgen-dev
           tags: |
             type=raw,value=${{ matrix.arch }}
-            type=raw,value=latest-${{ matrix.arch }}
       - uses: docker/build-push-action@v6
         with:
           context: .
