@@ -29,6 +29,8 @@ passphraseToggle.onchange = () => {
   saveSettings();
 };
 
+saveSettingsCheckbox.addEventListener('change', saveSettings);
+
 function togglePassphraseOptions() {
   document.getElementById('passwordOptions').style.display = passphraseToggle.checked ? 'none' : 'block';
   document.getElementById('passphraseOptions').style.display = passphraseToggle.checked ? 'block' : 'none';
@@ -37,7 +39,7 @@ function togglePassphraseOptions() {
 }
 
 document.querySelectorAll('input, select').forEach(element => {
-  if (element.id !== 'passphraseToggle') {
+  if (element.id !== 'passphraseToggle' && element.id !== 'separator' && element.id !== 'saveSettings') {
     element.addEventListener('change', () => {
       generatePassword();
       saveSettings();
