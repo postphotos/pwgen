@@ -29,7 +29,9 @@ passphraseToggle.onchange = () => {
   saveSettings();
 };
 
-saveSettingsCheckbox.addEventListener('change', saveSettings);
+if (saveSettingsCheckbox) {
+  saveSettingsCheckbox.addEventListener('change', saveSettings);
+}
 
 function togglePassphraseOptions() {
   document.getElementById('passwordOptions').style.display = passphraseToggle.checked ? 'none' : 'block';
