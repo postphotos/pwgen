@@ -183,27 +183,29 @@ function copyPassword(index) {
 }
 
 function saveSettings() {
-  if (saveSettingsCheckbox.checked) {
-    const settings = {
-      includeUppercase: includeUppercase.checked,
-      includeDigits: includeDigits.checked,
-      includeSpecial: includeSpecial.checked,
-      excludeHomoglyphs: excludeHomoglyphs.checked,
-      length: lengthSlider.value,
-      passphraseToggle: passphraseToggle.checked,
-      capitalizeWords: capitalizeWords.checked,
-      includeNumbers: includeNumbers.checked,
-      includeSpecialChars: includeSpecialChars.checked,
-      wordCount: wordCountSlider.value,
-      separator: separator.value,
-      customSeparator: customSeparator.value,
-      maxWordLength: maxWordLength.value,
-      language: languageSelect.value,
-      customLanguage: document.getElementById('customLanguage').value,
-    };
-    document.cookie = `pwgen-settings=${JSON.stringify(settings)};path=/;max-age=31536000;samesite=strict`;
-  } else {
-    document.cookie = 'pwgen-settings=;path=/;max-age=-1';
+  if (saveSettingsCheckbox) {
+    if (saveSettingsCheckbox.checked) {
+      const settings = {
+        includeUppercase: includeUppercase.checked,
+        includeDigits: includeDigits.checked,
+        includeSpecial: includeSpecial.checked,
+        excludeHomoglyphs: excludeHomoglyphs.checked,
+        length: lengthSlider.value,
+        passphraseToggle: passphraseToggle.checked,
+        capitalizeWords: capitalizeWords.checked,
+        includeNumbers: includeNumbers.checked,
+        includeSpecialChars: includeSpecialChars.checked,
+        wordCount: wordCountSlider.value,
+        separator: separator.value,
+        customSeparator: customSeparator.value,
+        maxWordLength: maxWordLength.value,
+        language: languageSelect.value,
+        customLanguage: document.getElementById('customLanguage').value,
+      };
+      document.cookie = `pwgen-settings=${JSON.stringify(settings)};path=/;max-age=31536000;samesite=strict`;
+    } else {
+      document.cookie = 'pwgen-settings=;path=/;max-age=-1';
+    }
   }
 }
 
@@ -237,7 +239,9 @@ function loadSettings() {
         document.getElementById('customLanguage').style.display = 'block';
         document.getElementById('customLanguage').value = settings.customLanguage;
       }
-      saveSettingsCheckbox.checked = true;
+      if (saveSettingsCheckbox) {
+        saveSettingsCheckbox.checked = true;
+      }
       togglePassphraseOptions();
     } catch (e) {
       console.error('Error parsing settings cookie:', e);
