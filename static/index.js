@@ -21,6 +21,7 @@ const BASE_PATH = window.BASE_PATH || '';
 
 separator.onchange = () => {
   customSeparator.style.display = separator.value === 'custom' ? 'block' : 'none';
+  generatePassword();
   saveSettings();
 };
 
